@@ -3,7 +3,6 @@ package controllers;
 import api.ReceiptResponse;
 import dao.ReceiptTagDao;
 import generated.tables.records.ReceiptsRecord;
-import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;

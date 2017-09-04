@@ -1,6 +1,6 @@
 CREATE TABLE receipts (
   id INT UNSIGNED AUTO_INCREMENT,
-  created TIME DEFAULT CURRENT_TIME(),
+  created TIME DEFAULT CURRENT_DATE (),
   merchant VARCHAR(255),
   amount DECIMAL(12,2),
 

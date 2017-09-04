@@ -5,14 +5,9 @@ import generated.tables.records.ReceiptTagsRecord;
 import generated.tables.records.ReceiptsRecord;
 import org.jooq.Configuration;
 import org.jooq.DSLContext;
-import org.jooq.Delete;
-import org.jooq.Row;
 import org.jooq.impl.DSL;
 
-import java.math.BigDecimal;
 import java.util.List;
-
-import static com.google.common.base.Preconditions.checkState;
 import static generated.Tables.RECEIPTS;
 import static generated.Tables.RECEIPT_TAGS;
 import static java.util.stream.Collectors.toList;
@@ -58,7 +53,7 @@ public class ReceiptTagDao {
     }
 
     public void insertTag(String _tagName, int _receiptID){
-        ReceiptTagsRecord receiptTagsRecord = dsl
+        dsl
                 .insertInto(RECEIPT_TAGS, RECEIPT_TAGS.TAG, RECEIPT_TAGS.RECEIPT_ID)
                 .values(_tagName, _receiptID)
                 .returning(RECEIPT_TAGS.ID)
@@ -66,7 +61,7 @@ public class ReceiptTagDao {
     }
 
     public void deleteTag(String _tagName, int _receiptID){
-        ReceiptTagsRecord receiptTagsRecord = dsl
+        dsl
                 .delete(RECEIPT_TAGS)
                 .where(RECEIPT_TAGS.TAG.eq(_tagName).and(RECEIPT_TAGS.RECEIPT_ID.eq(_receiptID)))
                 .returning(RECEIPT_TAGS.ID)
