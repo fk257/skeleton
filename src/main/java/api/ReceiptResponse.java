@@ -2,9 +2,13 @@ package api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import generated.tables.records.ReceiptsRecord;
+import org.joda.time.format.DateTimeFormat;
 
 import java.math.BigDecimal;
 import java.sql.Time;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.List;
 
 /**
  * This is an API Object.  Its purpose is to model the JSON API that we expose.
@@ -26,12 +30,23 @@ public class ReceiptResponse {
     BigDecimal amount;
 
     @JsonProperty
-    Time created;
+    String created;
+
+    @JsonProperty
+    List<String> tags;
 
     public ReceiptResponse(ReceiptsRecord dbRecord) {
         this.merchant = dbRecord.getMerchant();
         this.amount = dbRecord.getAmount();
         this.created = dbRecord.getCreated();
         this.id = dbRecord.getId();
+    }
+
+    public ReceiptResponse(ReceiptsRecord dbRecord, List<String> _tags) {
+        this.merchant = dbRecord.getMerchant();
+        this.amount = dbRecord.getAmount();
+        this.created = dbRecord.getCreated();
+        this.id = dbRecord.getId();
+        this.tags = _tags;
     }
 }

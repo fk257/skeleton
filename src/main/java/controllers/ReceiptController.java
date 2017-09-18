@@ -9,7 +9,9 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static java.util.stream.Collectors.toList;
 
@@ -31,6 +33,14 @@ public class ReceiptController {
     @GET
     public List<ReceiptResponse> getReceipts() {
         List<ReceiptsRecord> receiptRecords = receipts.getAllReceipts();
-        return receiptRecords.stream().map(ReceiptResponse::new).collect(toList());
+        Map<Integer, List<String>> associatedTags = receipts.getAllTags();
+
+        List<ReceiptResponse> results = new ArrayList<>();
+        for (ReceiptsRecord rec : receiptRecords){
+            results.add(new ReceiptResponse(rec, associatedTags.get(rec.getId())));
+        }
+
+        return results;
     }
+
 }

@@ -6,10 +6,14 @@ import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 
 import java.math.BigDecimal;
+import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkState;
 import static generated.Tables.RECEIPTS;
+import static generated.Tables.RECEIPT_TAGS;
 
 public class ReceiptDao {
     DSLContext dsl;
@@ -28,6 +32,14 @@ public class ReceiptDao {
         checkState(receiptsRecord != null && receiptsRecord.getId() != null, "Insert failed");
 
         return receiptsRecord.getId();
+    }
+
+    public Map<Integer, List<String>> getAllTags(){
+        return dsl.select()
+                .from(RECEIPT_TAGS
+                        .join(RECEIPTS)
+                        .on(RECEIPT_TAGS.RECEIPT_ID.eq(RECEIPTS.ID)))
+                .fetch().intoGroups(RECEIPTS.ID, RECEIPT_TAGS.TAG);
     }
 
     public List<ReceiptsRecord> getAllReceipts() {
