@@ -904,10 +904,7 @@
         var tagsStr = "";
         if (receipt.tags){
           for (var t = 0; t < receipt.tags.length; t++){
-            // tagsStr = tagsStr + `<button class="rm-tag" type="submit" style="height:20px;width:60px;font-size:10px;padding:0 0px;line-height:0px"><span class="tagValue">${receipt.tags[t]}</span> </button> \n`;
-            tagsStr = tagsStr + `<input class="rm-tag button" type="submit" value="${receipt.tags[t]}" style="height:20px;width:60px;font-size:10px;padding:0 0px;line-height:0px">
-              <span class="tagValue">${receipt.tags[t]}</span>
-            </input> \n`;
+            tagsStr = tagsStr + `<button class="rm-tag" value="${receipt.tags[t]}" type="submit" style="height:20px;width:60px;font-size:10px;padding:0 0px;line-height:0px"><span class="tagValue">${receipt.tags[t]}</span> </button> \n`;
           }
         }
         $(`
@@ -978,33 +975,27 @@
 
   // add tag to existing receipt
   $(document).ready(function() {
-    $(document).on('submit', "#tag-form" , function(e) {
-      e.preventDefault();
-      var _tag = $(".tag_input", this).val();
-      var _id = $(this).parent().find('#receiptID').text();
+  $(document).on('submit', "#tag-form" , function(e) {
+    e.preventDefault();
+    var _tag = $(".tag_input", this).val();
+    var _id = $(this).parent().find('#receiptID').text();
 
-      $(this).parent().find(".add-tag").css("display", "block");
-
-
-      $.ajax({
-          type: 'PUT',
-          url: api + '/tags/' + _tag,
-          data: _id,
-          contentType: 'application/json',
-          dataType: 'json'
-      });
+    $(this).parent().find(".add-tag").css("display", "block");
 
 
-      // `<button class="rm-tag" type="submit" style="height:20px;width:60px;font-size:10px;padding:0 0px;line-height:0px"><span class="tagValue">${_tag}</span> </button>`
-      $(
-        `<input class="rm-tag button" type="submit" value="${_tag}" style="height:20px;width:60px;font-size:10px;padding:0 0px;line-height:0px">
-          <span class="tagValue">${_tag}</span>
-        </input>`
-      ).insertBefore($(this));
+    $.ajax({
+        type: 'PUT',
+        url: api + '/tags/' + _tag,
+        data: _id,
+        contentType: 'application/json',
+        dataType: 'json'
+    });
 
-      //
+    $(
+      `<button class="rm-tag" value="${_tag}" type="submit" style="height:20px;width:60px;font-size:10px;padding:0 0px;line-height:0px"><span class="tagValue">${_tag}</span> </button> \n`
+    ).insertBefore($(this));
 
-      $(this).remove();
+    $(this).remove();
     });
   });
 
@@ -1025,11 +1016,13 @@
 
   // remove tag from receipt
   $(document).ready(function() {
-    $(document).on('submit', ".rm-tag" , function(e) {
+    $(document).on('click', ".rm-tag" , function(e) {
       e.preventDefault();
 
       var _tag = $(this).attr('value');
       var _id = $(this).parent().find('#receiptID').text();
+
+      $(this).remove();
 
       $.ajax({
           type: 'PUT',
@@ -1039,7 +1032,6 @@
           dataType: 'json'
       });
 
-      $(this).remove();
     });
   });
 
