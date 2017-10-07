@@ -22,6 +22,28 @@
   <!-- <link rel="stylesheet" href="css/normalize.css"> -->
   <!-- <link rel="stylesheet" href="css/skeleton.css"> -->
 
+  <script data-require="jquery@*" data-semver="3.1.1" src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+  <style>
+          body {
+              text-align: center;
+          }
+
+          video {
+              width: 550px;
+              height: 450px;
+              border: 1px solid black;
+          }
+
+          #vidwrap {
+              margin: 20px 0;
+          }
+
+          #start, #snapshot {
+              height: 3em;
+          }
+      </style>
+
   <style>
   /*! normalize.css v3.0.2 | MIT License | git.io/normalize */
 
@@ -878,6 +900,66 @@
   <!-- <script src="js/basic.js"></script> -->
 
   <script>
+          let imageCapture;
+          let track;
+
+          function attachMediaStream(mediaStream) {
+              $('video')[0].srcObject = mediaStream;
+
+              // Saving the track allows us to capture a photo
+              track = mediaStream.getVideoTracks()[0];
+              imageCapture = new ImageCapture(track);
+          }
+
+          function startVideo() {
+              navigator.mediaDevices.getUserMedia({video: {facingMode: {exact: "environment"}}})
+                  .then(attachMediaStream)
+                  .catch(error => {
+                      navigator.mediaDevices.getUserMedia({video: true})
+                          .then(attachMediaStream)
+                          .catch(error => {
+                              console.log('you are fooked');
+                          })
+                  })
+          }
+
+          function takeSnapshot() {
+              // create a CANVAS element that is same size as the image
+              imageCapture.grabFrame()
+              .then(img => {
+                  const canvas = document.createElement('canvas');
+                  canvas.width = img.width;
+                  canvas.height = img.height;
+
+                  canvas.getContext('2d').drawImage(img, 0, 0);
+                  const base64EncodedImageData = canvas.toDataURL('image/png').split(',')[1];
+                  $.ajax({
+                      url: "/images",
+                      type: "POST",
+                      data: base64EncodedImageData,
+                      contentType: "text/plain",
+                      success: function() {},
+                 })
+                  .then(response => {
+                      $('video').after(`<div>got response: <pre>${JSON.stringify(response)}</pre></div>`);
+                  })
+                  .always(() => console.log('request complete'));
+
+                  // For debugging, you can uncomment this to see the frame that was captured
+                  // $('BODY').append(canvas);
+              });
+
+          }
+
+
+          $(function () {
+              $('#start').on('click', startVideo);
+              $('video').on('play', () => $('#snapshot').prop('disabled', false));
+              $('#snapshot').on('click', takeSnapshot);
+          });
+      </script>
+
+  <script>
   // toggle add receipt form
   function toggleForm() {
       var x = document.getElementById('addReceipt');
@@ -991,6 +1073,7 @@
         dataType: 'json'
     });
 
+
     $(
       `<button class="rm-tag" value="${_tag}" type="submit" style="height:20px;width:60px;font-size:10px;padding:0 0px;line-height:0px"><span class="tagValue">${_tag}</span> </button> \n`
     ).insertBefore($(this));
@@ -1048,8 +1131,6 @@
   <!-- Primary Page Layout
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
   <div class="container">
-
-
     <div class="row" style="margin-top:4vh;">
         <h3 style="display:inline-block;">My Receipts</h3>
         <input class="button-primary u-pull-right" onclick="toggleForm()" type="submit" value="+" style="display:inline-block;" id="add-receipt">
@@ -1087,6 +1168,13 @@
       </div>
     </div> <hr>
     <div id="receiptList"> </div>
+  </div>
+
+  <button id="start">Start Video</button>
+  <button id="snapshot" disabled="true">Take a Snapshot!</button>
+  <br>
+  <div id="vidwrap">
+    <video autoplay></video>
   </div>
 
 <!-- End Document
